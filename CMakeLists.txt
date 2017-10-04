@@ -290,7 +290,7 @@ if ( CMAKE_HOST_APPLE )
 	if ( "${LAPACK_LIBRARIES}" MATCHES "Accelerate" )
 		if ( USE_FORTRAN )
 			message( STATUS "MacOS X: adding blas_fix library" )
-			add_library( blas_fix ${libblas_fix_src} )
+			add_library( blas_fix SHARED ${libblas_fix_src} )
 			list( APPEND LIBS blas_fix )
 			set( blas_fix blas_fix )
 		else()
@@ -339,7 +339,7 @@ if ( WIN32 )
 	#message( "libmagma_all_f   ${libmagma_all_f}"   )
 	
 	# on Windows, Fortran files aren't compiled if listed here...
-	cuda_add_library( magma ${libmagma_all_cpp} )
+	cuda_add_library( magma SHARED ${libmagma_all_cpp} )
 	target_link_libraries( magma
 		${LAPACK_LIBRARIES}
 		${CUDA_CUDART_LIBRARY}
@@ -362,7 +362,7 @@ if ( WIN32 )
 	set( LIBS tester lapacktest magma )  ##magmaf )
 else()
 	# Unix doesn't seem to have a problem with mixing C, CUDA, and Fortran files
-	cuda_add_library( magma ${libmagma_all} )
+	cuda_add_library( magma SHARED ${libmagma_all} )
 	target_link_libraries( magma
 		${LAPACK_LIBRARIES}
 		${CUDA_CUDART_LIBRARY}
@@ -371,6 +371,7 @@ else()
 	)
 endif()
 
+set_property(TARGET magma PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 # ----------------------------------------
 # compile tester library
@@ -406,7 +407,7 @@ endif()
 include_directories( sparse-iter/include )
 include_directories( sparse-iter/control )
 include_directories( testing )
-cuda_add_library( magma_sparse ${libsparse_all} )
+cuda_add_library( magma_sparse SHARED ${libsparse_all} )
 target_link_libraries( magma_sparse
 	magma
 	${LAPACK_LIBRARIES}
@@ -416,6 +417,7 @@ target_link_libraries( magma_sparse
 )
 set( LIBS_SPARSE ${LIBS} magma_sparse )
 
+set_property(TARGET magma_sparse PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 # ----------------------------------------
 # compile each tester
